@@ -3,7 +3,9 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import { GameData } from '../types';
 import { ChessboardSettings, defaultSettings } from '../config';
 import { useBoardLogic } from '../hooks/useBoardLogic';
-import { Key } from '../types';
+import { BoardBackground } from './BoardBackground';
+import { Piece } from './Piece';
+import { key2pos } from '../util';
 
 export interface BoardProps {
   fen: string;
@@ -18,7 +20,7 @@ export const Board: React.FC<BoardProps> = ({
   settings = defaultSettings,
   side,
 }) => {
-  const { pieces, onSelectSquare, selected } = useBoardLogic({
+  const { pieces } = useBoardLogic({
     fen,
     game,
     settings,
@@ -28,24 +30,42 @@ export const Board: React.FC<BoardProps> = ({
   const boardSize = side || screenWidth;
   const squareSize = boardSize / 8;
 
-  // Placeholder for pieces rendering
-  // Actual rendering will happen in a separate layer (Svg or Absolute Views)
-  // For now, simple view container
+  const colorScheme = settings.colorScheme || defaultSettings.colorScheme!;
+  const orientation = game?.playerSide === 'black' ? 'black' : 'white';
+
   return (
     <View style={[styles.container, { width: boardSize, height: boardSize }]}>
-      {/* Background (TODO: SVG Board) */}
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: settings.colorScheme?.background || '#d18b47' },
-        ]}
+      <BoardBackground
+        size={boardSize}
+        orientation={orientation}
+        colorScheme={colorScheme}
       />
 
       {/* Pieces */}
       {Array.from(pieces.entries()).map(([key, piece]) => {
-        // TODO: Convert key (a1) to coordinates (x, y)
-        // For now just empty placeholder to verify loop
-        return null;
+        const pos = key2pos(key);
+        // orientation processing
+        const file = orientation === 'white' ? pos[0] : 7 - pos[0];
+        const rank = orientation === 'white' ? 7 - pos[1] : pos[1];
+
+        const x = file * squareSize;
+        const y = rank * squareSize;
+
+        return (
+          <View
+            key={key}
+            style={[
+              styles.pieceContainer,
+              {
+                width: squareSize,
+                height: squareSize,
+                transform: [{ translateX: x }, { translateY: y }],
+              },
+            ]}
+          >
+            <Piece piece={piece} size={squareSize} />
+          </View>
+        );
       })}
     </View>
   );
@@ -54,5 +74,13 @@ export const Board: React.FC<BoardProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
+    overflow: 'hidden', // Ensure pieces don't overflow board
+  },
+  pieceContainer: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
