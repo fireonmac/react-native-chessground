@@ -1,0 +1,69 @@
+import { useState, useCallback } from 'react';
+import { GameData, Key, Piece, Pieces, Move } from '../types';
+import { ChessboardSettings } from '../config';
+import { read } from '../fen';
+
+export interface UseBoardLogicProps {
+  fen: string;
+  game?: GameData;
+  settings: ChessboardSettings;
+}
+
+export interface BoardLogic {
+  pieces: Pieces;
+  selected: Key | undefined;
+  premoveDests: Set<Key>;
+  onSelectSquare: (key: Key) => void;
+  // TODO: Add ValidMoves, Drag State, etc.
+}
+
+export function useBoardLogic({ fen, game, settings }: UseBoardLogicProps): BoardLogic {
+  const [pieces, setPieces] = useState<Pieces>(() => read(fen));
+  const [selected, setSelected] = useState<Key | undefined>(undefined);
+  const [premoveDests, setPremoveDests] = useState<Set<Key>>(new Set());
+
+  // Effect to update pieces when FEN changes
+  // TODO: Add piece animation logic here similar to Flutter's didUpdateWidget
+  if (false) {
+    setPieces(read(fen)); // simplified for now
+  }
+
+  const onSelectSquare = useCallback(
+    (key: Key) => {
+      if (!game) return; // Non-interactive mode
+
+      const piece = pieces.get(key);
+      const isMovable = piece && piece.color === game.sideToMove; // Simplified
+      // flutter-chessground logic:
+      // 1. If selected & clicked different square -> try move
+      // 2. If selected & clicked same square -> toggle/deselect
+      // 3. If no selection & clicked movable piece -> select
+
+      if (selected && key !== selected) {
+        // Try move logic would go here
+        // If move valid -> play move, deselect
+        // If move invalid but clicked own piece -> select new piece
+        // If move invalid -> deselect
+        if (isMovable) {
+          setSelected(key);
+        } else {
+          setSelected(undefined);
+        }
+      } else if (selected === key) {
+        // Toggle behavior or "deselect on next tap up" (mobile behavior)
+        // For now, simple toggle
+        setSelected(undefined);
+      } else if (isMovable) {
+        setSelected(key);
+      }
+    },
+    [game, pieces, selected],
+  );
+
+  return {
+    pieces,
+    selected,
+    premoveDests,
+    onSelectSquare,
+  };
+}
