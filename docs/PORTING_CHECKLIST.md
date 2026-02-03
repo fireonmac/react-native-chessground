@@ -5,7 +5,7 @@ All items must be verified to ensure the React Native package matches the behavi
 
 ## 1. Configuration & Props
 
-- [ ] **FEN Loading**: Board correctly renders any valid FEN string.
+- [x] **FEN Loading**: Board correctly renders any valid FEN string.
 - [ ] **Orientation**:
   - [ ] `white` (default): White pieces at bottom.
   - [ ] `black`: Black pieces at bottom.
@@ -13,8 +13,8 @@ All items must be verified to ensure the React Native package matches the behavi
   - [ ] `game` provided: User can move pieces.
   - [ ] `game` null (or `viewOnly`): Board is read-only.
 - [ ] **Settings (`ChessboardSettings`)**:
-  - [ ] `colorScheme`: Custom colors for board, highlights, etc.
-  - [ ] `pieceAssets`: Support for different piece sets (images/SVGs).
+  - [x] `colorScheme`: Custom colors for board, highlights, etc.
+  - [x] `pieceAssets`: Support for different piece sets (images/SVGs).
   - [ ] `pieceShiftMethod`:
     - [ ] `DRAG_OR_TAP`: Both valid.
     - [ ] `DRAG_ONLY`: Tapping ignored for movement.
@@ -28,13 +28,13 @@ All items must be verified to ensure the React Native package matches the behavi
 
 ## 2. Rendering
 
-- [ ] **Board Background**: Correct Light/Dark square colors based on `colorScheme`.
+- [x] **Board Background**: Correct Light/Dark square colors based on `colorScheme`.
 - [ ] **Coordinates**:
   - [ ] Correctly positioned (corner/edge).
   - [ ] Correct text (1-8, a-h).
   - [ ] Correct colors (contrast against square).
 - [ ] **Pieces**:
-  - [ ] Render pieces at correct square positions.
+  - [x] Render pieces at correct square positions.
   - [ ] `opponentsPiecesUpsideDown`: Rotate opponent pieces 180° if enabled.
 - [ ] **Highlights**:
   - [ ] **Last Move**: Highlight `from` and `to` squares.
