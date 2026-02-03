@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { GameData, Key, Piece, Pieces, Move } from '../types';
-import { ChessboardSettings } from '../config';
+import type { GameData, Key, Pieces } from '../types';
+import type { ChessboardSettings } from '../config';
 import { read } from '../fen';
 
 export interface UseBoardLogicProps {
@@ -17,16 +17,16 @@ export interface BoardLogic {
   // TODO: Add ValidMoves, Drag State, etc.
 }
 
-export function useBoardLogic({ fen, game, settings }: UseBoardLogicProps): BoardLogic {
-  const [pieces, setPieces] = useState<Pieces>(() => read(fen));
+export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
+  const [pieces] = useState<Pieces>(() => read(fen));
   const [selected, setSelected] = useState<Key | undefined>(undefined);
-  const [premoveDests, setPremoveDests] = useState<Set<Key>>(new Set());
+  const [premoveDests] = useState<Set<Key>>(new Set());
 
   // Effect to update pieces when FEN changes
   // TODO: Add piece animation logic here similar to Flutter's didUpdateWidget
-  if (false) {
-    setPieces(read(fen)); // simplified for now
-  }
+  // if (false) {
+  //   setPieces(read(fen));
+  // }
 
   const onSelectSquare = useCallback(
     (key: Key) => {
@@ -57,7 +57,7 @@ export function useBoardLogic({ fen, game, settings }: UseBoardLogicProps): Boar
         setSelected(key);
       }
     },
-    [game, pieces, selected],
+    [game, pieces, selected]
   );
 
   return {

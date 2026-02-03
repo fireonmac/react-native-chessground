@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { GameData } from '../types';
-import { ChessboardSettings, defaultSettings } from '../config';
+import type { GameData } from '../types';
+import { defaultSettings } from '../config';
+import type { ChessboardSettings } from '../config';
 import { useBoardLogic } from '../hooks/useBoardLogic';
 import { BoardBackground } from './BoardBackground';
 import { Piece } from './Piece';

@@ -157,5 +157,8 @@
       "release-it"
     ],
     "version": "0.57.0"
+  },
+  "dependencies": {
+    "react-native-svg": "^15.15.1"
   }
 }

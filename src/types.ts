@@ -23,7 +23,8 @@ export enum Side {
   BLACK = 'black',
 }
 
-export const oppositeSide = (side: Side): Side => (side === Side.WHITE ? Side.BLACK : Side.WHITE);
+export const oppositeSide = (side: Side): Side =>
+  side === Side.WHITE ? Side.BLACK : Side.WHITE;
 
 export interface Label {
   text: string;

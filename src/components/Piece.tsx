@@ -1,22 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Piece as PieceModel } from '../types';
+import { View, Image, StyleSheet } from 'react-native';
+import type { Piece as PieceModel } from '../types';
+import { getPieceAsset } from '../images';
 
 export interface PieceProps {
   piece: PieceModel;
   size: number;
+  pieceSet?: string; // e.g. 'cburnett'
 }
 
-export const Piece: React.FC<PieceProps> = ({ piece, size }) => {
-  // TODO: Load actual assets based on piece.role and piece.color
-  // For now, render text
+export const Piece: React.FC<PieceProps> = ({
+  piece,
+  size,
+  pieceSet = 'cburnett',
+}) => {
+  const source = getPieceAsset(pieceSet, piece.color, piece.role);
+
   return (
     <View style={[styles.container, { width: size, height: size }]}>
-      <Text style={{ fontSize: size * 0.8 }}>
-        {piece.color === 'white'
-          ? piece.role[0].toUpperCase()
-          : piece.role[0].toLowerCase()}
-      </Text>
+      <Image
+        source={source}
+        style={{ width: size, height: size }}
+        resizeMode="contain"
+      />
     </View>
   );
 };

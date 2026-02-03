@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import Svg, { Rect, G } from 'react-native-svg';
-import { ChessboardColorScheme } from '../config';
+import type { ChessboardColorScheme } from '../config';
 
 export interface BoardBackgroundProps {
   size: number;
