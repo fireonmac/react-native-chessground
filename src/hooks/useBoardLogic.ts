@@ -14,11 +14,12 @@ export interface BoardLogic {
   selected: Key | undefined;
   premoveDests: Set<Key>;
   onSelectSquare: (key: Key) => void;
+  onMove: (from: Key, to: Key) => void;
   // TODO: Add ValidMoves, Drag State, etc.
 }
 
 export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
-  const [pieces] = useState<Pieces>(() => read(fen));
+  const [pieces, setPieces] = useState<Pieces>(() => read(fen));
   const [selected, setSelected] = useState<Key | undefined>(undefined);
   const [premoveDests] = useState<Set<Key>>(new Set());
 
@@ -60,10 +61,30 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
     [game, pieces, selected]
   );
 
+  const onMove = useCallback(
+    (from: Key, to: Key) => {
+      const piece = pieces.get(from);
+      if (!piece) return;
+
+      // Optimistic update
+      const newPieces = new Map(pieces);
+      newPieces.delete(from);
+      newPieces.set(to, piece);
+      setPieces(newPieces); // Optimistic update
+
+      if (game?.onMove) {
+        game.onMove({ from, to });
+      }
+      setSelected(undefined);
+    },
+    [game, pieces]
+  );
+
   return {
     pieces,
     selected,
     premoveDests,
     onSelectSquare,
+    onMove,
   };
 }

@@ -5,8 +5,8 @@ import { defaultSettings } from '../config';
 import type { ChessboardSettings } from '../config';
 import { useBoardLogic } from '../hooks/useBoardLogic';
 import { BoardBackground } from './BoardBackground';
-import { Piece } from './Piece';
-import { key2pos } from '../util';
+import { DraggablePiece } from './DraggablePiece';
+import { key2pos, pos2key } from '../util';
 
 export interface BoardProps {
   fen: string;
@@ -21,7 +21,7 @@ export const Board: React.FC<BoardProps> = ({
   settings = defaultSettings,
   side,
 }) => {
-  const { pieces } = useBoardLogic({
+  const { pieces, onMove } = useBoardLogic({
     fen,
     game,
     settings,
@@ -33,6 +33,47 @@ export const Board: React.FC<BoardProps> = ({
 
   const colorScheme = settings.colorScheme || defaultSettings.colorScheme!;
   const orientation = game?.playerSide === 'black' ? 'black' : 'white';
+
+  const onPieceDrop = (key: string, tx: number, ty: number) => {
+    const pos = key2pos(key);
+    // orientation processing (reverse of render)
+    // rendered x = file * squareSize
+    // rendered y = rank * squareSize
+
+    // Logic coordinates (0-7, 0-7)
+    // Board coordinates (pixels)
+    // currentX = startX + tx
+    // currentY = startY + ty
+
+    // We need target square relative to board 0,0
+    // startX, startY are calculated in render
+    const file = orientation === 'white' ? pos[0] : 7 - pos[0];
+    const rank = orientation === 'white' ? 7 - pos[1] : pos[1];
+    const startX = file * squareSize;
+    const startY = rank * squareSize;
+
+    const targetX = startX + tx;
+    const targetY = startY + ty;
+
+    const targetFile = Math.floor(targetX / squareSize + 0.5);
+    const targetRank = Math.floor(targetY / squareSize + 0.5);
+
+    if (
+      targetFile >= 0 &&
+      targetFile <= 7 &&
+      targetRank >= 0 &&
+      targetRank <= 7
+    ) {
+      // Convert/Reverse orientation
+      const logicFile = orientation === 'white' ? targetFile : 7 - targetFile;
+      const logicRank = orientation === 'white' ? 7 - targetRank : targetRank;
+
+      const destKey = pos2key([logicFile, logicRank]);
+      if (destKey) {
+        onMove(key, destKey);
+      }
+    }
+  };
 
   return (
     <View style={[styles.container, { width: boardSize, height: boardSize }]}>
@@ -53,19 +94,15 @@ export const Board: React.FC<BoardProps> = ({
         const y = rank * squareSize;
 
         return (
-          <View
+          <DraggablePiece
             key={key}
-            style={[
-              styles.pieceContainer,
-              {
-                width: squareSize,
-                height: squareSize,
-                transform: [{ translateX: x }, { translateY: y }],
-              },
-            ]}
-          >
-            <Piece piece={piece} size={squareSize} />
-          </View>
+            piece={piece}
+            size={squareSize}
+            initialX={x}
+            initialY={y}
+            enabled={!!game} // Interaction enabled only if game data present
+            onDrop={(tx, ty) => onPieceDrop(key, tx, ty)}
+          />
         );
       })}
     </View>
@@ -76,12 +113,5 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     overflow: 'hidden', // Ensure pieces don't overflow board
-  },
-  pieceContainer: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
