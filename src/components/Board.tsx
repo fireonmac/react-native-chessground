@@ -1,11 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import type { GameData } from '../types';
 import { defaultSettings } from '../config';
 import type { ChessboardSettings } from '../config';
 import { useBoardLogic } from '../hooks/useBoardLogic';
 import { BoardBackground } from './BoardBackground';
 import { DraggablePiece } from './DraggablePiece';
+import { Highlights } from './Highlights';
 import { key2pos, pos2key } from '../util';
 
 export interface BoardProps {
@@ -13,6 +19,7 @@ export interface BoardProps {
   game?: GameData;
   settings?: ChessboardSettings;
   side?: number; // Size in pixels, undefined = auto fit width
+  lastMove?: { from: string; to: string };
 }
 
 export const Board: React.FC<BoardProps> = ({
@@ -20,8 +27,9 @@ export const Board: React.FC<BoardProps> = ({
   game,
   settings = defaultSettings,
   side,
+  lastMove,
 }) => {
-  const { pieces, onMove } = useBoardLogic({
+  const { pieces, selected, onMove, onSelectSquare } = useBoardLogic({
     fen,
     game,
     settings,
@@ -34,19 +42,19 @@ export const Board: React.FC<BoardProps> = ({
   const colorScheme = settings.colorScheme || defaultSettings.colorScheme!;
   const orientation = game?.playerSide === 'black' ? 'black' : 'white';
 
+  // Handle tap on a square
+  const onSquareTap = (file: number, rank: number) => {
+    console.log('Square tapped:', file, rank);
+    const key = pos2key([file, rank]);
+    console.log('Key:', key);
+    if (key) {
+      onSelectSquare(key);
+    }
+  };
+
+  // Handle piece drop (drag gesture)
   const onPieceDrop = (key: string, tx: number, ty: number) => {
     const pos = key2pos(key);
-    // orientation processing (reverse of render)
-    // rendered x = file * squareSize
-    // rendered y = rank * squareSize
-
-    // Logic coordinates (0-7, 0-7)
-    // Board coordinates (pixels)
-    // currentX = startX + tx
-    // currentY = startY + ty
-
-    // We need target square relative to board 0,0
-    // startX, startY are calculated in render
     const file = orientation === 'white' ? pos[0] : 7 - pos[0];
     const rank = orientation === 'white' ? 7 - pos[1] : pos[1];
     const startX = file * squareSize;
@@ -64,7 +72,6 @@ export const Board: React.FC<BoardProps> = ({
       targetRank >= 0 &&
       targetRank <= 7
     ) {
-      // Convert/Reverse orientation
       const logicFile = orientation === 'white' ? targetFile : 7 - targetFile;
       const logicRank = orientation === 'white' ? 7 - targetRank : targetRank;
 
@@ -75,6 +82,37 @@ export const Board: React.FC<BoardProps> = ({
     }
   };
 
+  // Render tap areas for each square
+  const renderTapAreas = () => {
+    const tapAreas = [];
+    for (let rank = 0; rank < 8; rank++) {
+      for (let file = 0; file < 8; file++) {
+        const displayFile = orientation === 'white' ? file : 7 - file;
+        const displayRank = orientation === 'white' ? 7 - rank : rank;
+
+        tapAreas.push(
+          <TouchableWithoutFeedback
+            key={`tap-${file}-${rank}`}
+            onPress={() => onSquareTap(file, rank)}
+          >
+            <View
+              pointerEvents="box-only"
+              style={{
+                position: 'absolute',
+                left: displayFile * squareSize,
+                top: displayRank * squareSize,
+                width: squareSize,
+                height: squareSize,
+                zIndex: 100, // Above pieces
+              }}
+            />
+          </TouchableWithoutFeedback>
+        );
+      }
+    }
+    return tapAreas;
+  };
+
   return (
     <View style={[styles.container, { width: boardSize, height: boardSize }]}>
       <BoardBackground
@@ -83,10 +121,18 @@ export const Board: React.FC<BoardProps> = ({
         colorScheme={colorScheme}
       />
 
+      {/* Highlights for last move, selected square, etc. */}
+      <Highlights
+        size={boardSize}
+        squareSize={squareSize}
+        selected={selected}
+        lastMove={lastMove}
+        orientation={orientation}
+      />
+
       {/* Pieces */}
       {Array.from(pieces.entries()).map(([key, piece]) => {
         const pos = key2pos(key);
-        // orientation processing
         const file = orientation === 'white' ? pos[0] : 7 - pos[0];
         const rank = orientation === 'white' ? 7 - pos[1] : pos[1];
 
@@ -100,11 +146,14 @@ export const Board: React.FC<BoardProps> = ({
             size={squareSize}
             initialX={x}
             initialY={y}
-            enabled={!!game} // Interaction enabled only if game data present
+            enabled={!!game}
             onDrop={(tx: number, ty: number) => onPieceDrop(key, tx, ty)}
           />
         );
       })}
+
+      {/* Tap areas for square selection - MUST render AFTER pieces */}
+      {game && renderTapAreas()}
     </View>
   );
 };
@@ -112,6 +161,6 @@ export const Board: React.FC<BoardProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    overflow: 'hidden', // Ensure pieces don't overflow board
+    overflow: 'hidden',
   },
 });
