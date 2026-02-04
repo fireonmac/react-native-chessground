@@ -8,6 +8,7 @@ interface HighlightsProps {
   squareSize: number;
   selected?: string;
   lastMove?: { from: string; to: string };
+  premove?: { from: string; to: string };
   checkSquare?: string;
   customHighlights?: Map<string, { color: string; opacity?: number }>;
   orientation: 'white' | 'black';
@@ -33,6 +34,7 @@ export const Highlights: React.FC<HighlightsProps> = ({
   squareSize,
   selected,
   lastMove,
+  premove,
   checkSquare,
   customHighlights,
   orientation,
@@ -87,6 +89,24 @@ export const Highlights: React.FC<HighlightsProps> = ({
         {/* Selected square highlight */}
         {selected &&
           renderHighlight(selected, 'rgba(20, 85, 30, 0.5)', 1, 'selected')}
+
+        {/* Premove highlight (from and to squares) */}
+        {premove && (
+          <>
+            {renderHighlight(
+              premove.from,
+              'rgba(20, 85, 30, 0.5)',
+              0.6,
+              'premove-from'
+            )}
+            {renderHighlight(
+              premove.to,
+              'rgba(20, 85, 30, 0.5)',
+              0.6,
+              'premove-to'
+            )}
+          </>
+        )}
 
         {/* Custom highlights */}
         {customHighlights &&

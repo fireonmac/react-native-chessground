@@ -122,6 +122,7 @@ export const Board: React.FC<BoardProps> = ({
         squareSize={squareSize}
         selected={selected}
         lastMove={lastMove}
+        premove={game?.premove}
         checkSquare={checkSquare}
         orientation={orientation}
       />
