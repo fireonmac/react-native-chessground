@@ -100,7 +100,7 @@ export const Board: React.FC<BoardProps> = ({
             onPress={() => onSquareTap(file, rank)}
           >
             <View
-              pointerEvents="box-only"
+              pointerEvents="box-none"
               style={[
                 styles.tapArea,
                 {
@@ -176,6 +176,7 @@ export const Board: React.FC<BoardProps> = ({
             initialY={y}
             enabled={!!game}
             animationDuration={settings.animationDuration}
+            onDragStart={() => onSquareTap(pos[0], pos[1])} // Select piece when drag starts
             onDrop={(tx: number, ty: number) => onPieceDrop(key, tx, ty)}
           />
         );

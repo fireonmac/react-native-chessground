@@ -72,7 +72,7 @@ export interface Move {
 }
 
 /**
- * Data required to render the board and handle interactions.
+ * The game state corresponding to an instance of a game.
  * Corresponds to Flutter's GameData.
  */
 export interface GameData {
@@ -103,6 +103,16 @@ export interface GameData {
   promotionMove?: Move;
 
   /**
+   * The premove that is currently set (for opponent's turn).
+   */
+  premove?: Move;
+
+  /**
+   * Valid premove destinations from the selected square.
+   */
+  premoveDestinations?: Set<Key>;
+
+  /**
    * Callback called when a move is played.
    */
   onMove?: (move: Move, metadata?: MoveMetadata) => void;
@@ -112,4 +122,9 @@ export interface GameData {
    * If role is undefined, the promotion was cancelled.
    */
   onPromotionSelection?: (role?: Role) => void;
+
+  /**
+   * Callback called when a premove is set or cleared.
+   */
+  onPremove?: (move: Move | null) => void;
 }
