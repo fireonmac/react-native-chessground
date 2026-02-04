@@ -86,12 +86,12 @@ export const PromotionSelector: React.FC<PromotionSelectorProps> = ({
                 styles.pieceButton,
                 { width: squareSize, height: squareSize },
               ]}
-              onPress={() => onSelect(role as PieceRole)}
+              onPress={() => onSelect(role)}
               activeOpacity={0.7}
             >
               <View style={styles.shadow} />
               <Image
-                source={getPieceImage(role as PieceRole)}
+                source={getPieceImage(role)}
                 style={[
                   styles.pieceImage,
                   {
