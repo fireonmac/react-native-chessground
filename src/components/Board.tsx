@@ -100,7 +100,7 @@ export const Board: React.FC<BoardProps> = ({
             onPress={() => onSquareTap(file, rank)}
           >
             <View
-              pointerEvents="box-none"
+              pointerEvents="box-only"
               style={[
                 styles.tapArea,
                 {

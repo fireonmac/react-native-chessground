@@ -105,7 +105,7 @@ export const AnimatedPiece: React.FC<AnimatedPieceProps> = ({
               { translateY: Animated.add(translateY, dragOffsetY) },
               { scale },
             ],
-            zIndex: isDragging ? 100 : 1,
+            zIndex: isDragging ? 100 : 60, // 60 to be above tap areas (50), 100 when dragging
           },
         ]}
       >
