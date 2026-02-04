@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import type { GameData, Key, Pieces, PlayerSide } from '../types';
+import type { GameData, Key, Pieces } from '../types';
+import { PlayerSide } from '../types';
 import type { ChessboardSettings } from '../config';
 import { read } from '../fen';
 import { premovesOf } from '../premove';
@@ -51,15 +52,15 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
       const { playerSide, sideToMove } = game;
 
       // PlayerSide.BOTH means both players can move
-      if (playerSide === ('both' as PlayerSide)) {
+      if (playerSide === PlayerSide.BOTH) {
         return piece.color === sideToMove;
       }
 
       // PlayerSide.WHITE/BLACK means only that side can move
-      if (playerSide === ('white' as PlayerSide)) {
+      if (playerSide === PlayerSide.WHITE) {
         return piece.color === 'white';
       }
-      if (playerSide === ('black' as PlayerSide)) {
+      if (playerSide === PlayerSide.BLACK) {
         return piece.color === 'black';
       }
 
@@ -78,11 +79,11 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
       const { playerSide, sideToMove } = game;
 
       // Can only premove when it's NOT your turn
-      if (playerSide === ('both' as PlayerSide)) {
+      if (playerSide === PlayerSide.BOTH) {
         return piece.color !== sideToMove;
       }
 
-      if (playerSide === ('white' as PlayerSide)) {
+      if (playerSide === PlayerSide.WHITE) {
         return piece.color === 'white' && sideToMove === 'black';
       }
 
