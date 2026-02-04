@@ -10,7 +10,7 @@ import { defaultSettings } from '../config';
 import type { ChessboardSettings } from '../config';
 import { useBoardLogic } from '../hooks/useBoardLogic';
 import { BoardBackground } from './BoardBackground';
-import { DraggablePiece } from './DraggablePiece';
+import { AnimatedPiece } from './AnimatedPiece';
 import { Highlights } from './Highlights';
 import { ValidMovesMarkers } from './ValidMovesMarkers';
 import { Coordinates } from './Coordinates';
@@ -168,13 +168,14 @@ export const Board: React.FC<BoardProps> = ({
         const y = rank * squareSize;
 
         return (
-          <DraggablePiece
+          <AnimatedPiece
             key={key}
             piece={piece}
             size={squareSize}
             initialX={x}
             initialY={y}
             enabled={!!game}
+            animationDuration={settings.animationDuration}
             onDrop={(tx: number, ty: number) => onPieceDrop(key, tx, ty)}
           />
         );
