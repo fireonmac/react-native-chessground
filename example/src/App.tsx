@@ -11,6 +11,10 @@ export default function App() {
   const [fen, setFen] = useState(
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   );
+  const [lastMove, setLastMove] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
   const [promotionMove, setPromotionMove] = useState<{
     from: string;
     to: string;
@@ -60,9 +64,10 @@ export default function App() {
       }
       newPosition.play(move);
 
-      // Update FEN
+      // Update FEN and last move
       const newFen = makeFen(newPosition.toSetup());
       setFen(newFen);
+      setLastMove({ from, to });
     },
     [position]
   );
@@ -125,6 +130,7 @@ export default function App() {
         <Text style={styles.title}>React Native Chessground</Text>
         <Board
           fen={fen}
+          lastMove={lastMove ?? undefined}
           game={{
             playerSide: PlayerSide.BOTH,
             sideToMove: position.turn === 'white' ? Side.WHITE : Side.BLACK,
