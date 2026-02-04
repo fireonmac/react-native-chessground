@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Board, PlayerSide, Side, type Role } from 'react-native-chessground';
@@ -75,6 +75,43 @@ export default function App() {
     },
     [position]
   );
+
+  // Track previous FEN to detect changes
+  const prevFenRef = useRef(fen);
+
+  // Auto-execute premove when position changes
+  useEffect(() => {
+    // Only execute if FEN actually changed and we have a premove
+    if (prevFenRef.current === fen || !premove) {
+      prevFenRef.current = fen;
+      return;
+    }
+
+    prevFenRef.current = fen;
+
+    // Check if premove is still legal in the new position
+    const fromSquare = parseSquare(premove.from);
+    const toSquare = parseSquare(premove.to);
+
+    if (fromSquare === undefined || toSquare === undefined) {
+      console.log('Premove cancelled: invalid squares');
+      setPremove(null);
+      return;
+    }
+
+    // Check if the move is legal
+    const legalDests = position.dests(fromSquare);
+    if (!legalDests.has(toSquare)) {
+      console.log('Premove cancelled: move is not legal');
+      setPremove(null);
+      return;
+    }
+
+    // Execute the premove
+    console.log('Executing premove:', premove);
+    playMove(premove.from, premove.to);
+    setPremove(null);
+  }, [fen, premove, position, playMove]);
 
   const handleMove = useCallback(
     ({ from, to }: { from: string; to: string }) => {
