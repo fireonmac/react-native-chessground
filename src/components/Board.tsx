@@ -13,6 +13,7 @@ import { BoardBackground } from './BoardBackground';
 import { DraggablePiece } from './DraggablePiece';
 import { Highlights } from './Highlights';
 import { ValidMovesMarkers } from './ValidMovesMarkers';
+import { Coordinates } from './Coordinates';
 import { key2pos, pos2key } from '../util';
 
 export interface BoardProps {
@@ -140,6 +141,17 @@ export const Board: React.FC<BoardProps> = ({
         pieces={pieces}
         orientation={orientation}
       />
+
+      {/* Coordinates (a-h, 1-8) */}
+      {settings.enableCoordinates && (
+        <Coordinates
+          size={boardSize}
+          squareSize={squareSize}
+          orientation={orientation}
+          lightSquareColor="#F0D9B5"
+          darkSquareColor="#B58863"
+        />
+      )}
 
       {/* Pieces */}
       {Array.from(pieces.entries()).map(([key, piece]) => {
