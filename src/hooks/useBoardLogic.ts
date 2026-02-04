@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { GameData, Key, Pieces, PlayerSide } from '../types';
 import type { ChessboardSettings } from '../config';
 import { read } from '../fen';
+import { premovesOf } from '../premove';
 
 export interface UseBoardLogicProps {
   fen: string;
@@ -13,6 +14,7 @@ export interface BoardLogic {
   pieces: Pieces;
   selected: Key | undefined;
   validDests: Set<Key>;
+  premoveDests: Set<Key>;
   onSelectSquare: (key: Key) => void;
   onMove: (from: Key, to: Key) => void;
 }
@@ -20,10 +22,14 @@ export interface BoardLogic {
 export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
   const [pieces, setPieces] = useState<Pieces>(() => read(fen));
   const [selected, setSelected] = useState<Key | undefined>(undefined);
+  const [premoveDests, setPremoveDests] = useState<Set<Key>>(new Set());
 
   // Update pieces when FEN changes
   useEffect(() => {
     setPieces(read(fen));
+    // Clear selection and premove dests on position change
+    setSelected(undefined);
+    setPremoveDests(new Set());
   }, [fen]);
 
   // Get valid destinations for selected square
@@ -62,6 +68,29 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
     [game, pieces]
   );
 
+  // Check if a piece can be premoved (opponent's turn)
+  const canPremovePiece = useCallback(
+    (key: Key): boolean => {
+      if (!game) return false;
+      const piece = pieces.get(key);
+      if (!piece) return false;
+
+      const { playerSide, sideToMove } = game;
+
+      // Can only premove when it's NOT your turn
+      if (playerSide === ('both' as PlayerSide)) {
+        return piece.color !== sideToMove;
+      }
+
+      if (playerSide === ('white' as PlayerSide)) {
+        return piece.color === 'white' && sideToMove === 'black';
+      }
+
+      return piece.color === 'black' && sideToMove === 'white';
+    },
+    [game, pieces]
+  );
+
   // Check if a move is valid
   const isValidMove = useCallback(
     (from: Key, to: Key): boolean => {
@@ -91,46 +120,89 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
     [game, pieces]
   );
 
+  // Handle square selection (including premoves)
   const onSelectSquare = useCallback(
     (key: Key) => {
       if (!game) return; // Non-interactive mode
 
-      // Flutter logic:
-      // 1. If something selected & clicked different square -> try move or select new piece
-      // 2. If something selected & clicked same square -> deselect
-      // 3. If nothing selected & clicked own piece -> select
-
+      // 1. If selected piece and clicking a valid destination -> move
       if (selected && key !== selected) {
-        // Try to move to this square
+        // Try normal move first
         if (isValidMove(selected, key)) {
           onMove(selected, key);
+          setPremoveDests(new Set());
           return;
         }
 
-        // Invalid move - check if clicked another own piece
-        if (canSelectPiece(key)) {
-          setSelected(key);
-        } else {
-          // Clicked invalid square - deselect
+        // Try premove
+        if (premoveDests.has(key)) {
+          game?.onPremove?.({ from: selected, to: key });
           setSelected(undefined);
+          setPremoveDests(new Set());
+          return;
         }
-      } else if (selected === key) {
-        // Clicked the selected piece again - deselect
-        setSelected(undefined);
-      } else {
-        // No selection - try to select this piece
+
+        // Try to select another piece
         if (canSelectPiece(key)) {
           setSelected(key);
+          setPremoveDests(new Set());
+          return;
+        }
+
+        if (canPremovePiece(key)) {
+          setSelected(key);
+          const dests = premovesOf(key, pieces, true);
+          setPremoveDests(dests);
+          return;
+        }
+
+        // Invalid - deselect
+        setSelected(undefined);
+        setPremoveDests(new Set());
+      }
+      // 2. Clicking selected piece again or premove origin -> deselect/cancel
+      else if (selected === key || game.premove?.from === key) {
+        game?.onPremove?.(null);
+        setSelected(undefined);
+        setPremoveDests(new Set());
+      }
+      // 3. Try to select a new piece
+      else {
+        // Cancel existing premove if clicking empty square
+        if (!pieces.get(key) && game.premove) {
+          game?.onPremove?.(null);
+          setSelected(undefined);
+          setPremoveDests(new Set());
+          return;
+        }
+
+        if (canSelectPiece(key)) {
+          setSelected(key);
+          setPremoveDests(new Set());
+        } else if (canPremovePiece(key)) {
+          setSelected(key);
+          const dests = premovesOf(key, pieces, true);
+          setPremoveDests(dests);
         }
       }
     },
-    [game, selected, canSelectPiece, isValidMove, onMove]
+    [
+      game,
+      selected,
+      premoveDests,
+      canSelectPiece,
+      canPremovePiece,
+      isValidMove,
+      onMove,
+      pieces,
+    ]
   );
 
   return {
     pieces,
     selected,
     validDests,
+    premoveDests,
     onSelectSquare,
     onMove,
   };

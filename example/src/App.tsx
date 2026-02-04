@@ -15,6 +15,10 @@ export default function App() {
     from: string;
     to: string;
   } | null>(null);
+  const [premove, setPremove] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
   const [promotionMove, setPromotionMove] = useState<{
     from: string;
     to: string;
@@ -136,7 +140,12 @@ export default function App() {
             sideToMove: position.turn === 'white' ? Side.WHITE : Side.BLACK,
             isCheck: position.isCheck(),
             validMoves,
+            premove: premove ?? undefined,
             onMove: handleMove,
+            onPremove: (move) => {
+              console.log('Premove set:', move);
+              setPremove(move);
+            },
             promotionMove: promotionMove ? promotionMove : undefined,
             onPromotionSelection: handlePromotionSelection,
           }}

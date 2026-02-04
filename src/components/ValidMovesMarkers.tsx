@@ -7,8 +7,10 @@ interface ValidMovesMarkersProps {
   size: number;
   squareSize: number;
   validDests: Set<Key>;
+  premoveDests?: Set<Key>;
   pieces: Pieces;
   color?: string;
+  premoveColor?: string;
   orientation: 'white' | 'black';
 }
 
@@ -31,12 +33,15 @@ export const ValidMovesMarkers: React.FC<ValidMovesMarkersProps> = ({
   size,
   squareSize,
   validDests,
+  premoveDests = new Set(),
   pieces,
-  color = 'rgba(20, 85, 30, 0.5)',
+  color = 'rgba(20, 85, 30, 0.5)', // Green for regular moves
+  premoveColor = 'rgba(32, 48, 133, 0.4)', // Blue for premoves
   orientation,
 }) => {
   const markers = useMemo(() => {
-    return Array.from(validDests).map((dest) => {
+    // Render marker (dot or ring) for a destination square
+    const renderMarker = (dest: Key, markerColor: string) => {
       const [file, rank] = key2coords(dest, orientation);
       const x = file * squareSize + squareSize / 2;
       const y = rank * squareSize + squareSize / 2;
@@ -54,7 +59,7 @@ export const ValidMovesMarkers: React.FC<ValidMovesMarkersProps> = ({
             cy={y}
             r={radius}
             fill="none"
-            stroke={color}
+            stroke={markerColor}
             strokeWidth={strokeWidth}
           />
         );
@@ -68,14 +73,36 @@ export const ValidMovesMarkers: React.FC<ValidMovesMarkersProps> = ({
             cx={x}
             cy={y}
             r={radius}
-            fill={color}
+            fill={markerColor}
           />
         );
       }
-    });
-  }, [validDests, pieces, squareSize, color, orientation]);
+    };
 
-  if (validDests.size === 0) {
+    const result = [];
+
+    // Render valid move markers (green)
+    for (const dest of validDests) {
+      result.push(renderMarker(dest, color));
+    }
+
+    // Render premove markers (blue)
+    for (const dest of premoveDests) {
+      result.push(renderMarker(dest, premoveColor));
+    }
+
+    return result;
+  }, [
+    validDests,
+    premoveDests,
+    pieces,
+    squareSize,
+    color,
+    premoveColor,
+    orientation,
+  ]);
+
+  if (validDests.size === 0 && premoveDests.size === 0) {
     return null;
   }
 

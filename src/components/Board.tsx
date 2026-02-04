@@ -27,7 +27,7 @@ export const Board: React.FC<BoardProps> = ({
   side,
   lastMove,
 }) => {
-  const { pieces, selected, validDests, onMove, onSelectSquare } =
+  const { pieces, selected, validDests, premoveDests, onMove, onSelectSquare } =
     useBoardLogic({
       fen,
       game,
@@ -131,6 +131,7 @@ export const Board: React.FC<BoardProps> = ({
         size={boardSize}
         squareSize={squareSize}
         validDests={validDests}
+        premoveDests={premoveDests}
         pieces={pieces}
         orientation={orientation}
       />
