@@ -1,12 +1,6 @@
-import React, { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
 import { Piece } from './Piece';
 import type { Piece as PieceModel } from '../types';
 
@@ -27,51 +21,46 @@ export const DraggablePiece: React.FC<DraggablePieceProps> = ({
   onDrop,
   enabled = true,
 }) => {
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const isDragging = useSharedValue(false);
-
-  // Reset position if initialX/Y changes (though usually component unmounts on move)
-  useEffect(() => {
-    translateX.value = 0;
-    translateY.value = 0;
-  }, [initialX, initialY, translateX, translateY]);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
 
   const pan = Gesture.Pan()
     .enabled(enabled)
     .onStart(() => {
-      isDragging.value = true;
+      setIsDragging(true);
     })
     .onUpdate((event) => {
-      translateX.value = event.translationX;
-      translateY.value = event.translationY;
+      setPosition({
+        x: event.translationX,
+        y: event.translationY,
+      });
     })
     .onEnd(() => {
-      isDragging.value = false;
-      runOnJS(onDrop)(translateX.value, translateY.value);
-      // Snap back if not unmounted (invalid move)
-      translateX.value = withSpring(0);
-      translateY.value = withSpring(0);
+      setIsDragging(false);
+      onDrop(position.x, position.y);
+      // Reset position
+      setPosition({ x: 0, y: 0 });
     });
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
+  const combinedStyle: any = [
+    {
+      ...styles.container,
+      width: size,
+      height: size,
       transform: [
-        { translateX: initialX + translateX.value },
-        { translateY: initialY + translateY.value },
-        { scale: isDragging.value ? 1.2 : 1 }, // Visual feedback
+        { translateX: initialX + position.x },
+        { translateY: initialY + position.y },
+        { scale: isDragging ? 1.2 : 1 },
       ],
-      zIndex: isDragging.value ? 100 : 1, // Bring to front
-    };
-  });
+      zIndex: isDragging ? 100 : 1,
+    },
+  ];
 
   return (
     <GestureDetector gesture={pan}>
-      <Animated.View
-        style={[styles.container, { width: size, height: size }, animatedStyle]}
-      >
+      <View style={combinedStyle}>
         <Piece piece={piece} size={size} />
-      </Animated.View>
+      </View>
     </GestureDetector>
   );
 };
