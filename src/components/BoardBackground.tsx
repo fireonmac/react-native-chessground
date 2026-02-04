@@ -8,16 +8,13 @@ export interface BoardBackgroundProps {
   colorScheme: ChessboardColorScheme;
 }
 
-export const BoardBackground: React.FC<BoardBackgroundProps> = ({
-  size,
-  colorScheme,
-}) => {
+export const BoardBackground: React.FC<BoardBackgroundProps> = ({ size }) => {
   const squareSize = size / 8;
 
   const squares = useMemo(() => {
     const rects = [];
-    const lightColor = '#F0D9B5'; // Default light color (TODO: Add to ColorScheme?)
-    const darkColor = colorScheme.background || '#B58863'; // Use scheme background as dark color
+    const lightColor = '#F0D9B5'; // Light beige squares
+    const darkColor = '#B58863'; // Dark brown squares
 
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
@@ -37,7 +34,7 @@ export const BoardBackground: React.FC<BoardBackgroundProps> = ({
       }
     }
     return rects;
-  }, [squareSize, colorScheme]); // squareSize depends on size
+  }, [squareSize]);
 
   return (
     <Svg width={size} height={size}>

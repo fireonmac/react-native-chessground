@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Board } from 'react-native-chessground';
+import { Board, PlayerSide, Side } from 'react-native-chessground';
 
 export default function App() {
   const [fen] = useState(
@@ -14,15 +14,13 @@ export default function App() {
         <Text style={styles.title}>Chessground Demo</Text>
         <Board
           fen={fen}
-          game={
-            {
-              playerSide: 'white', // hardcoded enum value for now, fix types compatibility if needed
-              sideToMove: 'white',
-              onMove: ({ from, to }: { from: string; to: string }) => {
-                console.log(`Move ${from} -> ${to}`);
-              },
-            } as any
-          } // Cast to any temporarily to avoid strict Enum matching issues in demo if types mismatch
+          game={{
+            playerSide: PlayerSide.WHITE,
+            sideToMove: Side.WHITE,
+            onMove: ({ from, to }: { from: string; to: string }) => {
+              console.log(`Move ${from} -> ${to}`);
+            },
+          }}
         />
       </View>
     </GestureHandlerRootView>

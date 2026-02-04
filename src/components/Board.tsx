@@ -101,7 +101,7 @@ export const Board: React.FC<BoardProps> = ({
             initialX={x}
             initialY={y}
             enabled={!!game} // Interaction enabled only if game data present
-            onDrop={(tx, ty) => onPieceDrop(key, tx, ty)}
+            onDrop={(tx: number, ty: number) => onPieceDrop(key, tx, ty)}
           />
         );
       })}

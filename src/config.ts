@@ -50,7 +50,7 @@ export interface ChessboardColorScheme {
 
 // Simplified default color scheme (brown)
 export const ChessboardColorSchemeBrown: ChessboardColorScheme = {
-  background: '#f0d9b5', // Example placeholder
+  background: '#B58863', // Dark brown (for dark squares)
   lastMove: 'rgba(155, 199, 0, 0.41)',
   selected: 'rgba(20, 85, 30, 0.5)',
   validMoves: 'rgba(20, 85, 30, 0.5)',
