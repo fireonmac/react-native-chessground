@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { GameData, Key, Pieces, PlayerSide } from '../types';
 import type { ChessboardSettings } from '../config';
 import { read } from '../fen';
@@ -12,6 +12,7 @@ export interface UseBoardLogicProps {
 export interface BoardLogic {
   pieces: Pieces;
   selected: Key | undefined;
+  validDests: Set<Key>;
   onSelectSquare: (key: Key) => void;
   onMove: (from: Key, to: Key) => void;
 }
@@ -24,6 +25,14 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
   useEffect(() => {
     setPieces(read(fen));
   }, [fen]);
+
+  // Get valid destinations for selected square
+  const validDests = useMemo(() => {
+    if (!selected || !game?.validMoves) {
+      return new Set<Key>();
+    }
+    return game.validMoves.get(selected) || new Set<Key>();
+  }, [selected, game]);
 
   // Check if a piece can be selected by the current player
   const canSelectPiece = useCallback(
@@ -121,6 +130,7 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
   return {
     pieces,
     selected,
+    validDests,
     onSelectSquare,
     onMove,
   };

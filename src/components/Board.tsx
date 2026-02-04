@@ -12,6 +12,7 @@ import { useBoardLogic } from '../hooks/useBoardLogic';
 import { BoardBackground } from './BoardBackground';
 import { DraggablePiece } from './DraggablePiece';
 import { Highlights } from './Highlights';
+import { ValidMovesMarkers } from './ValidMovesMarkers';
 import { key2pos, pos2key } from '../util';
 
 export interface BoardProps {
@@ -29,11 +30,12 @@ export const Board: React.FC<BoardProps> = ({
   side,
   lastMove,
 }) => {
-  const { pieces, selected, onMove, onSelectSquare } = useBoardLogic({
-    fen,
-    game,
-    settings,
-  });
+  const { pieces, selected, validDests, onMove, onSelectSquare } =
+    useBoardLogic({
+      fen,
+      game,
+      settings,
+    });
 
   const screenWidth = Dimensions.get('window').width;
   const boardSize = side || screenWidth;
@@ -127,6 +129,15 @@ export const Board: React.FC<BoardProps> = ({
         squareSize={squareSize}
         selected={selected}
         lastMove={lastMove}
+        orientation={orientation}
+      />
+
+      {/* Valid move markers (dots and rings) */}
+      <ValidMovesMarkers
+        size={boardSize}
+        squareSize={squareSize}
+        validDests={validDests}
+        pieces={pieces}
         orientation={orientation}
       />
 
