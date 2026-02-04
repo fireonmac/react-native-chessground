@@ -1,15 +1,20 @@
 import { useState, useMemo, useCallback } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Board, PlayerSide, Side } from 'react-native-chessground';
+import { Board, PlayerSide, Side, type Role } from 'react-native-chessground';
 import { Chess } from 'chessops/chess';
 import { parseFen, makeFen } from 'chessops/fen';
 import { parseSquare, makeSquare } from 'chessops/util';
+import type { Move } from 'chessops/types';
 
 export default function App() {
   const [fen, setFen] = useState(
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
   );
+  const [promotionMove, setPromotionMove] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
 
   // Parse FEN and create Chess position
   const position = useMemo(() => {
@@ -40,6 +45,28 @@ export default function App() {
     return moves;
   }, [position]);
 
+  const playMove = useCallback(
+    (from: string, to: string, promotion?: Role) => {
+      const fromSquare = parseSquare(from);
+      const toSquare = parseSquare(to);
+
+      if (fromSquare === undefined || toSquare === undefined) return;
+
+      // Create a new position and play the move
+      const newPosition = position.clone();
+      const move: Move = { from: fromSquare, to: toSquare };
+      if (promotion) {
+        (move as any).promotion = promotion;
+      }
+      newPosition.play(move);
+
+      // Update FEN
+      const newFen = makeFen(newPosition.toSetup());
+      setFen(newFen);
+    },
+    [position]
+  );
+
   const handleMove = useCallback(
     ({ from, to }: { from: string; to: string }) => {
       console.log(`Move ${from} -> ${to}`);
@@ -59,22 +86,43 @@ export default function App() {
         return;
       }
 
-      // Create a new position and play the move
-      const newPosition = position.clone();
-      newPosition.play({ from: fromSquare, to: toSquare });
+      // Check if this is a pawn promotion
+      const piece = position.board.get(fromSquare);
+      const isPromotion =
+        piece?.role === 'pawn' &&
+        ((piece.color === 'white' && to[1] === '8') ||
+          (piece.color === 'black' && to[1] === '1'));
 
-      // Update FEN
-      const newFen = makeFen(newPosition.toSetup());
-      setFen(newFen);
+      if (isPromotion) {
+        // Set promotion move and show selector
+        setPromotionMove({ from, to });
+      } else {
+        // Play the move immediately
+        playMove(from, to);
+      }
     },
-    [position]
+    [position, playMove]
+  );
+
+  const handlePromotionSelection = useCallback(
+    (role?: Role) => {
+      if (!promotionMove) return;
+
+      if (role) {
+        // Play the move with the selected promotion
+        playMove(promotionMove.from, promotionMove.to, role);
+      }
+
+      // Clear promotion state
+      setPromotionMove(null);
+    },
+    [promotionMove, playMove]
   );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.container}>
       <View style={styles.container}>
-        <Text style={styles.title}>Chessground + Chessops</Text>
-        <Text style={styles.subtitle}>Tap a piece to see valid moves!</Text>
+        <Text style={styles.title}>React Native Chessground</Text>
         <Board
           fen={fen}
           game={{
@@ -82,6 +130,8 @@ export default function App() {
             sideToMove: position.turn === 'white' ? Side.WHITE : Side.BLACK,
             validMoves,
             onMove: handleMove,
+            promotionMove: promotionMove ? promotionMove : undefined,
+            onPromotionSelection: handlePromotionSelection,
           }}
         />
       </View>

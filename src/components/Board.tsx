@@ -14,6 +14,7 @@ import { DraggablePiece } from './DraggablePiece';
 import { Highlights } from './Highlights';
 import { ValidMovesMarkers } from './ValidMovesMarkers';
 import { Coordinates } from './Coordinates';
+import { PromotionSelector } from './PromotionSelector';
 import { key2pos, pos2key } from '../util';
 
 export interface BoardProps {
@@ -100,14 +101,15 @@ export const Board: React.FC<BoardProps> = ({
           >
             <View
               pointerEvents="box-only"
-              style={{
-                position: 'absolute',
-                left: displayFile * squareSize,
-                top: displayRank * squareSize,
-                width: squareSize,
-                height: squareSize,
-                zIndex: 100, // Above pieces
-              }}
+              style={[
+                styles.tapArea,
+                {
+                  left: displayFile * squareSize,
+                  top: displayRank * squareSize,
+                  width: squareSize,
+                  height: squareSize,
+                },
+              ]}
             />
           </TouchableWithoutFeedback>
         );
@@ -177,6 +179,18 @@ export const Board: React.FC<BoardProps> = ({
 
       {/* Tap areas for square selection - MUST render AFTER pieces */}
       {game && renderTapAreas()}
+
+      {/* Promotion selector */}
+      {game?.promotionMove && game?.onPromotionSelection && (
+        <PromotionSelector
+          move={game.promotionMove}
+          color={game.sideToMove}
+          squareSize={squareSize}
+          orientation={orientation}
+          onSelect={(role) => game.onPromotionSelection?.(role)}
+          onCancel={() => game.onPromotionSelection?.(undefined)}
+        />
+      )}
     </View>
   );
 };
@@ -185,5 +199,9 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     overflow: 'hidden',
+  },
+  tapArea: {
+    position: 'absolute',
+    zIndex: 100,
   },
 });

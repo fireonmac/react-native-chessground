@@ -1,5 +1,6 @@
 export type Color = 'white' | 'black';
 export type Role = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
+export type PieceRole = Role;
 export type FEN = string;
 export type Key = string; // e.g. "a1", "h8"
 
