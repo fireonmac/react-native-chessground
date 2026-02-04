@@ -155,7 +155,10 @@ export const Board: React.FC<BoardProps> = ({
         />
       )}
 
-      {/* Pieces */}
+      {/* Tap areas for square selection - BELOW pieces so drag works */}
+      {game && renderTapAreas()}
+
+      {/* Pieces - ABOVE tap areas so they can be dragged */}
       {Array.from(pieces.entries()).map(([key, piece]) => {
         const pos = key2pos(key);
         const file = orientation === 'white' ? pos[0] : 7 - pos[0];
@@ -176,9 +179,6 @@ export const Board: React.FC<BoardProps> = ({
           />
         );
       })}
-
-      {/* Tap areas for square selection - MUST render AFTER pieces */}
-      {game && renderTapAreas()}
 
       {/* Promotion selector */}
       {game?.promotionMove && game?.onPromotionSelection && (
@@ -202,6 +202,6 @@ const styles = StyleSheet.create({
   },
   tapArea: {
     position: 'absolute',
-    zIndex: 100,
+    zIndex: 50,
   },
 });
