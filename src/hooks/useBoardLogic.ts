@@ -1,64 +1,66 @@
-import { useState, useCallback } from 'react';
-import type { GameData, Key, Pieces } from '../types';
+import { useState, useCallback, useEffect } from 'react';
+import type { GameData, Key, Pieces, PlayerSide } from '../types';
 import type { ChessboardSettings } from '../config';
 import { read } from '../fen';
 
 export interface UseBoardLogicProps {
   fen: string;
   game?: GameData;
-  settings: ChessboardSettings;
+  settings?: ChessboardSettings;
 }
 
 export interface BoardLogic {
   pieces: Pieces;
   selected: Key | undefined;
-  premoveDests: Set<Key>;
   onSelectSquare: (key: Key) => void;
   onMove: (from: Key, to: Key) => void;
-  // TODO: Add ValidMoves, Drag State, etc.
 }
 
 export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
   const [pieces, setPieces] = useState<Pieces>(() => read(fen));
   const [selected, setSelected] = useState<Key | undefined>(undefined);
-  const [premoveDests] = useState<Set<Key>>(new Set());
 
-  // Effect to update pieces when FEN changes
-  // TODO: Add piece animation logic here similar to Flutter's didUpdateWidget
-  // if (false) {
-  //   setPieces(read(fen));
-  // }
+  // Update pieces when FEN changes
+  useEffect(() => {
+    setPieces(read(fen));
+  }, [fen]);
 
-  const onSelectSquare = useCallback(
-    (key: Key) => {
-      if (!game) return; // Non-interactive mode
-
+  // Check if a piece can be selected by the current player
+  const canSelectPiece = useCallback(
+    (key: Key): boolean => {
+      if (!game) return false;
       const piece = pieces.get(key);
-      const isMovable = piece && piece.color === game.sideToMove; // Simplified
-      // flutter-chessground logic:
-      // 1. If selected & clicked different square -> try move
-      // 2. If selected & clicked same square -> toggle/deselect
-      // 3. If no selection & clicked movable piece -> select
+      if (!piece) return false;
 
-      if (selected && key !== selected) {
-        // Try move logic would go here
-        // If move valid -> play move, deselect
-        // If move invalid but clicked own piece -> select new piece
-        // If move invalid -> deselect
-        if (isMovable) {
-          setSelected(key);
-        } else {
-          setSelected(undefined);
-        }
-      } else if (selected === key) {
-        // Toggle behavior or "deselect on next tap up" (mobile behavior)
-        // For now, simple toggle
-        setSelected(undefined);
-      } else if (isMovable) {
-        setSelected(key);
+      // Check if piece belongs to the player side
+      const { playerSide, sideToMove } = game;
+
+      // PlayerSide.BOTH means both players can move
+      if (playerSide === ('both' as PlayerSide)) {
+        return piece.color === sideToMove;
       }
+
+      // PlayerSide.WHITE/BLACK means only that side can move
+      if (playerSide === ('white' as PlayerSide)) {
+        return piece.color === 'white';
+      }
+      if (playerSide === ('black' as PlayerSide)) {
+        return piece.color === 'black';
+      }
+
+      return false;
     },
-    [game, pieces, selected]
+    [game, pieces]
+  );
+
+  // Check if a move is valid
+  const isValidMove = useCallback(
+    (from: Key, to: Key): boolean => {
+      if (!game?.validMoves) return true; // No validation if validMoves not provided
+      const dests = game.validMoves.get(from);
+      return dests?.has(to) ?? false;
+    },
+    [game]
   );
 
   const onMove = useCallback(
@@ -70,7 +72,7 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
       const newPieces = new Map(pieces);
       newPieces.delete(from);
       newPieces.set(to, piece);
-      setPieces(newPieces); // Optimistic update
+      setPieces(newPieces);
 
       if (game?.onMove) {
         game.onMove({ from, to });
@@ -80,10 +82,45 @@ export function useBoardLogic({ fen, game }: UseBoardLogicProps): BoardLogic {
     [game, pieces]
   );
 
+  const onSelectSquare = useCallback(
+    (key: Key) => {
+      if (!game) return; // Non-interactive mode
+
+      // Flutter logic:
+      // 1. If something selected & clicked different square -> try move or select new piece
+      // 2. If something selected & clicked same square -> deselect
+      // 3. If nothing selected & clicked own piece -> select
+
+      if (selected && key !== selected) {
+        // Try to move to this square
+        if (isValidMove(selected, key)) {
+          onMove(selected, key);
+          return;
+        }
+
+        // Invalid move - check if clicked another own piece
+        if (canSelectPiece(key)) {
+          setSelected(key);
+        } else {
+          // Clicked invalid square - deselect
+          setSelected(undefined);
+        }
+      } else if (selected === key) {
+        // Clicked the selected piece again - deselect
+        setSelected(undefined);
+      } else {
+        // No selection - try to select this piece
+        if (canSelectPiece(key)) {
+          setSelected(key);
+        }
+      }
+    },
+    [game, selected, canSelectPiece, isValidMove, onMove]
+  );
+
   return {
     pieces,
     selected,
-    premoveDests,
     onSelectSquare,
     onMove,
   };
