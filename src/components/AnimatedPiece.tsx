@@ -9,7 +9,6 @@ interface AnimatedPieceProps {
   size: number;
   initialX: number;
   initialY: number;
-  onDragStart?: () => void; // Called when drag gesture starts
   onDrop: (translateX: number, translateY: number) => void;
   enabled?: boolean;
   animationDuration?: number;
@@ -20,7 +19,6 @@ export const AnimatedPiece: React.FC<AnimatedPieceProps> = ({
   size,
   initialX,
   initialY,
-  onDragStart,
   onDrop,
   enabled = true,
   animationDuration = 250,
@@ -64,7 +62,6 @@ export const AnimatedPiece: React.FC<AnimatedPieceProps> = ({
   const pan = Gesture.Pan()
     .enabled(enabled)
     .onStart(() => {
-      onDragStart?.(); // Notify parent that drag started (selects piece)
       setIsDragging(true);
       Animated.spring(scale, {
         toValue: 1.2,

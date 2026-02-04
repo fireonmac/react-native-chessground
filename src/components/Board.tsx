@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import { StyleSheet, Dimensions, Pressable } from 'react-native';
 import type { GameData } from '../types';
 import { defaultSettings } from '../config';
 import type { ChessboardSettings } from '../config';
@@ -86,40 +81,29 @@ export const Board: React.FC<BoardProps> = ({
     }
   };
 
-  // Render tap areas for each square
-  const renderTapAreas = () => {
-    const tapAreas = [];
-    for (let rank = 0; rank < 8; rank++) {
-      for (let file = 0; file < 8; file++) {
-        const displayFile = orientation === 'white' ? file : 7 - file;
-        const displayRank = orientation === 'white' ? 7 - rank : rank;
-
-        tapAreas.push(
-          <TouchableWithoutFeedback
-            key={`tap-${file}-${rank}`}
-            onPress={() => onSquareTap(file, rank)}
-          >
-            <View
-              pointerEvents="box-only"
-              style={[
-                styles.tapArea,
-                {
-                  left: displayFile * squareSize,
-                  top: displayRank * squareSize,
-                  width: squareSize,
-                  height: squareSize,
-                },
-              ]}
-            />
-          </TouchableWithoutFeedback>
-        );
-      }
-    }
-    return tapAreas;
-  };
-
   return (
-    <View style={[styles.container, { width: boardSize, height: boardSize }]}>
+    <Pressable
+      onPressIn={(event) => {
+        // Calculate which square was pressed from touch coordinates (like Flutter's offsetSquare)
+        const { locationX, locationY } = event.nativeEvent;
+        const file = Math.floor(locationX / squareSize);
+        const rank = Math.floor(locationY / squareSize);
+
+        // Convert display coordinates to logical coordinates
+        const logicFile = orientation === 'white' ? file : 7 - file;
+        const logicRank = orientation === 'white' ? 7 - rank : rank;
+
+        if (
+          logicFile >= 0 &&
+          logicFile < 8 &&
+          logicRank >= 0 &&
+          logicRank < 8
+        ) {
+          onSquareTap(logicFile, logicRank);
+        }
+      }}
+      style={[styles.container, { width: boardSize, height: boardSize }]}
+    >
       <BoardBackground
         size={boardSize}
         orientation={orientation}
@@ -155,10 +139,7 @@ export const Board: React.FC<BoardProps> = ({
         />
       )}
 
-      {/* Tap areas for square selection - BELOW pieces so drag works */}
-      {game && renderTapAreas()}
-
-      {/* Pieces - ABOVE tap areas so they can be dragged */}
+      {/* Pieces */}
       {Array.from(pieces.entries()).map(([key, piece]) => {
         const pos = key2pos(key);
         const file = orientation === 'white' ? pos[0] : 7 - pos[0];
@@ -176,7 +157,6 @@ export const Board: React.FC<BoardProps> = ({
             initialY={y}
             enabled={!!game}
             animationDuration={settings.animationDuration}
-            onDragStart={() => onSquareTap(pos[0], pos[1])} // Select piece when drag starts
             onDrop={(tx: number, ty: number) => onPieceDrop(key, tx, ty)}
           />
         );
@@ -193,7 +173,7 @@ export const Board: React.FC<BoardProps> = ({
           onCancel={() => game.onPromotionSelection?.(undefined)}
         />
       )}
-    </View>
+    </Pressable>
   );
 };
 
@@ -201,9 +181,5 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     overflow: 'hidden',
-  },
-  tapArea: {
-    position: 'absolute',
-    zIndex: 50,
   },
 });
