@@ -40,7 +40,6 @@ export function read(fen: FEN): Map<string, Piece> {
   }
   return pieces;
 }
-3;
 
 export function write(pieces: Map<string, Piece>): FEN {
   // TODO: Implement write logic
