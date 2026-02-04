@@ -70,13 +70,13 @@ export const Highlights: React.FC<HighlightsProps> = ({
           <>
             {renderHighlight(
               lastMove.from,
-              'rgba(155, 199, 0, 0.41)',
+              'rgba(156, 199, 0, 0.5)',
               1,
               'lastmove-from'
             )}
             {renderHighlight(
               lastMove.to,
-              'rgba(155, 199, 0, 0.41)',
+              'rgba(156, 199, 0, 0.5)',
               1,
               'lastmove-to'
             )}
