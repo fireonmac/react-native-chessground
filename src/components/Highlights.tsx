@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
+import { CheckHighlight } from './CheckHighlight';
 
 interface HighlightsProps {
   size: number;
@@ -87,9 +88,6 @@ export const Highlights: React.FC<HighlightsProps> = ({
         {selected &&
           renderHighlight(selected, 'rgba(20, 85, 30, 0.5)', 1, 'selected')}
 
-        {/* Check highlight */}
-        {checkSquare && renderHighlight(checkSquare, '#ff0000', 0.3, 'check')}
-
         {/* Custom highlights */}
         {customHighlights &&
           Array.from(customHighlights.entries()).map(
@@ -97,6 +95,26 @@ export const Highlights: React.FC<HighlightsProps> = ({
               renderHighlight(key, color, opacity, `custom-${key}`)
           )}
       </Svg>
+
+      {/* Check highlight (rendered outside SVG for proper layering) */}
+      {checkSquare &&
+        (() => {
+          const [file, rank] = key2coords(checkSquare, orientation);
+          const x = file * squareSize;
+          const y = rank * squareSize;
+          return (
+            <View
+              key="check-highlight"
+              style={{
+                position: 'absolute',
+                left: x,
+                top: y,
+              }}
+            >
+              <CheckHighlight size={squareSize} />
+            </View>
+          );
+        })()}
     </View>
   );
 };

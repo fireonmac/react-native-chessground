@@ -43,13 +43,23 @@ export const Board: React.FC<BoardProps> = ({
 
   // Handle tap on a square
   const onSquareTap = (file: number, rank: number) => {
-    console.log('Square tapped:', file, rank);
-    const key = pos2key([file, rank]);
-    console.log('Key:', key);
-    if (key) {
-      onSelectSquare(key);
-    }
+    onSelectSquare(pos2key([file, rank])!);
   };
+
+  // Get king square if in check
+  const getKingSquare = (): string | undefined => {
+    if (!game?.isCheck) return undefined;
+
+    // Find the king of the side to move
+    for (const [key, piece] of pieces.entries()) {
+      if (piece.role === 'king' && piece.color === game?.sideToMove) {
+        return key;
+      }
+    }
+    return undefined;
+  };
+
+  const checkSquare = getKingSquare();
 
   // Handle piece drop (drag gesture)
   const onPieceDrop = (key: string, tx: number, ty: number) => {
@@ -112,6 +122,7 @@ export const Board: React.FC<BoardProps> = ({
         squareSize={squareSize}
         selected={selected}
         lastMove={lastMove}
+        checkSquare={checkSquare}
         orientation={orientation}
       />
 

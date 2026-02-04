@@ -98,7 +98,7 @@ export interface GameData {
   isCheck?: boolean;
 
   /**
-   * The promotion move that is currently being selected.
+   * If set, a pawn promotion is pending.
    */
   promotionMove?: Move;
 

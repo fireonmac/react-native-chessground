@@ -128,6 +128,7 @@ export default function App() {
           game={{
             playerSide: PlayerSide.BOTH,
             sideToMove: position.turn === 'white' ? Side.WHITE : Side.BLACK,
+            isCheck: position.isCheck(),
             validMoves,
             onMove: handleMove,
             promotionMove: promotionMove ? promotionMove : undefined,
