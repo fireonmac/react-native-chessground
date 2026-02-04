@@ -27,12 +27,11 @@ export const Board: React.FC<BoardProps> = ({
   side,
   lastMove,
 }) => {
-  const { pieces, selected, validDests, onMove, onSelectSquare } =
-    useBoardLogic({
-      fen,
-      game,
-      settings,
-    });
+  const { pieces, selected, validDests, onSelectSquare } = useBoardLogic({
+    fen,
+    game,
+    settings,
+  });
 
   const screenWidth = Dimensions.get('window').width;
   const boardSize = side || screenWidth;
@@ -51,35 +50,31 @@ export const Board: React.FC<BoardProps> = ({
     }
   };
 
-  // Handle piece drop (drag gesture)
-  const onPieceDrop = (key: string, tx: number, ty: number) => {
-    const pos = key2pos(key);
-    const file = orientation === 'white' ? pos[0] : 7 - pos[0];
-    const rank = orientation === 'white' ? 7 - pos[1] : pos[1];
-    const startX = file * squareSize;
-    const startY = rank * squareSize;
-
-    const targetX = startX + tx;
-    const targetY = startY + ty;
-
-    const targetFile = Math.floor(targetX / squareSize + 0.5);
-    const targetRank = Math.floor(targetY / squareSize + 0.5);
-
-    if (
-      targetFile >= 0 &&
-      targetFile <= 7 &&
-      targetRank >= 0 &&
-      targetRank <= 7
-    ) {
-      const logicFile = orientation === 'white' ? targetFile : 7 - targetFile;
-      const logicRank = orientation === 'white' ? 7 - targetRank : targetRank;
-
-      const destKey = pos2key([logicFile, logicRank]);
-      if (destKey) {
-        onMove(key, destKey);
-      }
-    }
-  };
+  // DISABLED: Drag functionality temporarily removed
+  // const onPieceDrop = (key: string, tx: number, ty: number) => {
+  //   const pos = key2pos(key);
+  //   const file = orientation === 'white' ? pos[0] : 7 - pos[0];
+  //   const rank = orientation === 'white' ? 7 - pos[1] : pos[1];
+  //   const startX = file * squareSize;
+  //   const startY = rank * squareSize;
+  //   const targetX = startX + tx;
+  //   const targetY = startY + ty;
+  //   const targetFile = Math.floor(targetX / squareSize + 0.5);
+  //   const targetRank = Math.floor(targetY / squareSize + 0.5);
+  //   if (
+  //     targetFile >= 0 &&
+  //     targetFile <= 7 &&
+  //     targetRank >= 0 &&
+  //     targetRank <= 7
+  //   ) {
+  //     const logicFile = orientation === 'white' ? targetFile : 7 - targetFile;
+  //     const logicRank = orientation === 'white' ? 7 - targetRank : targetRank;
+  //     const destKey = pos2key([logicFile, logicRank]);
+  //     if (destKey) {
+  //       onMove(key, destKey);
+  //     }
+  //   }
+  // };
 
   return (
     <Pressable
@@ -157,7 +152,7 @@ export const Board: React.FC<BoardProps> = ({
             initialY={y}
             enabled={!!game}
             animationDuration={settings.animationDuration}
-            onDrop={(tx: number, ty: number) => onPieceDrop(key, tx, ty)}
+            onTap={() => onSquareTap(pos[0], pos[1])}
           />
         );
       })}
