@@ -58,7 +58,7 @@ export const PromotionSelector: React.FC<PromotionSelectorProps> = ({
 
   // Get piece image using shared helper
   const getPieceImage = (role: PieceRole) => {
-    return getPieceAsset('standard', color, role);
+    return getPieceAsset('cburnett', color, role);
   };
 
   return (
