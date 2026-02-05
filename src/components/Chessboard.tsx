@@ -12,7 +12,7 @@ import { Coordinates } from './Coordinates';
 import { PromotionSelector } from './PromotionSelector';
 import { key2pos, pos2key } from '../util';
 
-export interface BoardProps {
+export interface ChessboardProps {
   fen: string;
   game?: GameData;
   settings?: ChessboardSettings;
@@ -20,7 +20,7 @@ export interface BoardProps {
   lastMove?: { from: string; to: string };
 }
 
-export const Board: React.FC<BoardProps> = ({
+export const Chessboard: React.FC<ChessboardProps> = ({
   fen,
   game,
   settings = defaultSettings,
