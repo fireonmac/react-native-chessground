@@ -1,3 +1,5 @@
-export function multiply(a: number, b: number): number {
-  return a * b;
-}
+export { Board } from './components/Board';
+export * from './types';
+export * from './config';
+export * from './fen';
+export * from './util';
