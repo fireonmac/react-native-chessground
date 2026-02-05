@@ -68,6 +68,10 @@ export interface MoveMetadata {
 export interface Move {
   from: Key;
   to: Key;
+  /**
+   * The role of the promoted piece, if any.
+   */
+  promotion?: Role;
   metadata?: MoveMetadata;
 }
 
