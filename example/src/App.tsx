@@ -64,7 +64,7 @@ export default function App() {
       const newPosition = position.clone();
       const move: Move = { from: fromSquare, to: toSquare };
       if (promotion) {
-        (move as any).promotion = promotion;
+        move.promotion = promotion;
       }
       newPosition.play(move);
 
