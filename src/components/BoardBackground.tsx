@@ -6,17 +6,19 @@ export interface BoardBackgroundProps {
   size: number;
   /** @todo Not yet implemented - will be used to flip board rendering */
   orientation?: 'white' | 'black';
-  /** @todo Not yet implemented - currently uses hardcoded colors */
   colorScheme: ChessboardColorScheme;
 }
 
-export const BoardBackground: React.FC<BoardBackgroundProps> = ({ size }) => {
+export const BoardBackground: React.FC<BoardBackgroundProps> = ({
+  size,
+  colorScheme,
+}) => {
   const squareSize = size / 8;
 
   const squares = useMemo(() => {
     const rects = [];
-    const lightColor = '#F0D9B5'; // Light beige squares
-    const darkColor = '#B58863'; // Dark brown squares
+    const lightColor = colorScheme.lightSquare;
+    const darkColor = colorScheme.darkSquare;
 
     for (let rank = 0; rank < 8; rank++) {
       for (let file = 0; file < 8; file++) {
@@ -36,7 +38,7 @@ export const BoardBackground: React.FC<BoardBackgroundProps> = ({ size }) => {
       }
     }
     return rects;
-  }, [squareSize]);
+  }, [squareSize, colorScheme.lightSquare, colorScheme.darkSquare]);
 
   return (
     <Svg width={size} height={size}>
