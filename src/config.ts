@@ -38,7 +38,6 @@ export enum PieceOrientationBehavior {
 }
 
 export interface ChessboardColorScheme {
-  background: string; // Color
   lightSquare: string; // Light square color
   darkSquare: string; // Dark square color
   whiteCoordBackground?: string; // Color
@@ -52,7 +51,6 @@ export interface ChessboardColorScheme {
 
 // Simplified default color scheme (brown)
 export const ChessboardColorSchemeBrown: ChessboardColorScheme = {
-  background: '#B58863', // Dark brown (for dark squares)
   lightSquare: '#F0D9B5', // Light beige
   darkSquare: '#B58863', // Dark brown
   lastMove: 'rgba(155, 199, 0, 0.41)',
