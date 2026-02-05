@@ -132,6 +132,8 @@ export const Board: React.FC<BoardProps> = ({
         validDests={validDests}
         premoveDests={premoveDests}
         pieces={pieces}
+        color={colorScheme.validMoves}
+        premoveColor={colorScheme.validPremoves}
         orientation={orientation}
       />
 
