@@ -12,9 +12,9 @@ interface HighlightsProps {
   checkSquare?: string;
   customHighlights?: Map<string, { color: string; opacity?: number }>;
   orientation: 'white' | 'black';
-  lastMoveColor?: string;
-  selectedColor?: string;
-  premoveColor?: string;
+  lastMoveColor: string;
+  selectedColor: string;
+  premoveColor: string;
 }
 
 // Helper to convert square key to board coordinates
@@ -41,9 +41,9 @@ export const Highlights: React.FC<HighlightsProps> = ({
   checkSquare,
   customHighlights,
   orientation,
-  lastMoveColor = 'rgba(156, 199, 0, 0.5)',
-  selectedColor = 'rgba(20, 85, 30, 0.5)',
-  premoveColor = 'rgba(20, 85, 30, 0.5)',
+  lastMoveColor,
+  selectedColor,
+  premoveColor,
 }) => {
   const renderHighlight = (
     key: string,

@@ -124,6 +124,7 @@ export const Board: React.FC<BoardProps> = ({
         checkSquare={checkSquare}
         lastMoveColor={colorScheme.lastMove}
         selectedColor={colorScheme.selected}
+        premoveColor={colorScheme.selected}
         orientation={orientation}
       />
 
