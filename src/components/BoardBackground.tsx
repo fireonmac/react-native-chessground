@@ -4,7 +4,9 @@ import type { ChessboardColorScheme } from '../config';
 
 export interface BoardBackgroundProps {
   size: number;
-  orientation?: 'white' | 'black'; // Kept for interface consistency
+  /** @todo Not yet implemented - will be used to flip board rendering */
+  orientation?: 'white' | 'black';
+  /** @todo Not yet implemented - currently uses hardcoded colors */
   colorScheme: ChessboardColorScheme;
 }
 
