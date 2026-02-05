@@ -12,6 +12,9 @@ interface HighlightsProps {
   checkSquare?: string;
   customHighlights?: Map<string, { color: string; opacity?: number }>;
   orientation: 'white' | 'black';
+  lastMoveColor?: string;
+  selectedColor?: string;
+  premoveColor?: string;
 }
 
 // Helper to convert square key to board coordinates
@@ -38,6 +41,9 @@ export const Highlights: React.FC<HighlightsProps> = ({
   checkSquare,
   customHighlights,
   orientation,
+  lastMoveColor = 'rgba(156, 199, 0, 0.5)',
+  selectedColor = 'rgba(20, 85, 30, 0.5)',
+  premoveColor = 'rgba(20, 85, 30, 0.5)',
 }) => {
   const renderHighlight = (
     key: string,
@@ -71,40 +77,19 @@ export const Highlights: React.FC<HighlightsProps> = ({
         {/* Last move highlights */}
         {lastMove && (
           <>
-            {renderHighlight(
-              lastMove.from,
-              'rgba(156, 199, 0, 0.5)',
-              1,
-              'lastmove-from'
-            )}
-            {renderHighlight(
-              lastMove.to,
-              'rgba(156, 199, 0, 0.5)',
-              1,
-              'lastmove-to'
-            )}
+            {renderHighlight(lastMove.from, lastMoveColor, 1, 'lastmove-from')}
+            {renderHighlight(lastMove.to, lastMoveColor, 1, 'lastmove-to')}
           </>
         )}
 
         {/* Selected square highlight */}
-        {selected &&
-          renderHighlight(selected, 'rgba(20, 85, 30, 0.5)', 1, 'selected')}
+        {selected && renderHighlight(selected, selectedColor, 1, 'selected')}
 
         {/* Premove highlight (from and to squares) */}
         {premove && (
           <>
-            {renderHighlight(
-              premove.from,
-              'rgba(20, 85, 30, 0.5)',
-              0.6,
-              'premove-from'
-            )}
-            {renderHighlight(
-              premove.to,
-              'rgba(20, 85, 30, 0.5)',
-              0.6,
-              'premove-to'
-            )}
+            {renderHighlight(premove.from, premoveColor, 0.6, 'premove-from')}
+            {renderHighlight(premove.to, premoveColor, 0.6, 'premove-to')}
           </>
         )}
 
