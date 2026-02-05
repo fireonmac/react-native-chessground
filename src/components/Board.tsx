@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Dimensions, Pressable } from 'react-native';
 import type { GameData } from '../types';
 import { defaultSettings } from '../config';
@@ -46,8 +46,8 @@ export const Board: React.FC<BoardProps> = ({
     onSelectSquare(pos2key([file, rank])!);
   };
 
-  // Get king square if in check
-  const getKingSquare = (): string | undefined => {
+  // Get king square if in check (memoized for performance)
+  const checkSquare = useMemo((): string | undefined => {
     if (!game?.isCheck) return undefined;
 
     // Find the king of the side to move
@@ -57,9 +57,7 @@ export const Board: React.FC<BoardProps> = ({
       }
     }
     return undefined;
-  };
-
-  const checkSquare = getKingSquare();
+  }, [game?.isCheck, game?.sideToMove, pieces]);
 
   // Handle piece drop (drag gesture)
   const onPieceDrop = (key: string, tx: number, ty: number) => {
