@@ -74,7 +74,9 @@ export function createGameData(
      */
     onMoveError?: (move: Move, error: string) => void;
   }
-): Omit<GameData, 'playerSide'> {
+): Required<
+  Pick<GameData, 'validMoves' | 'sideToMove' | 'isCheck' | 'onMove'>
+> {
   return {
     validMoves: adapter.getValidMoves(),
     sideToMove: adapter.getSideToMove(),
