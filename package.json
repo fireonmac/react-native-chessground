@@ -51,6 +51,7 @@
   },
   "author": "Hyunho <fireonamc@gmail.com> (https://github.com/fireonmac)",
   "license": "MIT",
+  "private": true,
   "bugs": {
     "url": "https://github.com/fireonmac/react-native-chessground/issues"
   },
