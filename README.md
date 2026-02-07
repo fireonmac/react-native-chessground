@@ -4,13 +4,13 @@
 [![License](https://img.shields.io/npm/l/react-native-chessground.svg)](https://www.npmjs.com/package/react-native-chessground)
 
 A React Native port of the [flutter-chessground](https://github.com/lichess-org/flutter-chessground) library.
-It is built using `react-native-reanimated` and `@shopify/react-native-skia` to ensure native performance purely on the UI thread.
+It is built using `react-native-svg` to ensure native performance purely on the UI thread.
 
 This library handles board rendering and user interaction, but **does not handle chess logic**. It provides a flexible **Adapter Interface** so you can plug in any chess engine (chess.js, chessops, stockfish, or custom logic).
 
 ## Features
 
-- 📱 **Native Performance**: Built with React Native Skia and Reanimated for 60/120 FPS animations.
+- 📱 **Native Performance**: Built with React Native SVG for 60/120 FPS animations.
 - 🧩 **Engine Agnostic**: Zero dependencies on specific chess libraries. Use what you want.
 - 🎨 **Customizable**: Themes, piece sets, and board colors.
 - ✨ **Rich Interactions**:
@@ -38,7 +38,7 @@ yarn add react-native-chessground
 This library requires the following peer dependencies:
 
 ```sh
-npm install react-native-reanimated @shopify/react-native-skia react-native-gesture-handler react-native-svg
+npm install react-native-gesture-handler react-native-svg
 ```
 
 ## Usage
