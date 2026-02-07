@@ -74,7 +74,7 @@ export function createGameData(
      */
     onMoveError?: (move: Move, error: string) => void;
   }
-): Partial<GameData> {
+): Omit<GameData, 'playerSide'> {
   return {
     validMoves: adapter.getValidMoves(),
     sideToMove: adapter.getSideToMove(),

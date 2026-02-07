@@ -5,7 +5,6 @@ import {
   Chessboard,
   PlayerSide,
   createGameData,
-  Side,
   type Role,
   type Move,
 } from 'react-native-chessground';
@@ -131,8 +130,6 @@ export default function App() {
           game={{
             playerSide: PlayerSide.BOTH,
             ...adapterGameData,
-            sideToMove: adapterGameData.sideToMove ?? Side.WHITE,
-            isCheck: adapterGameData.isCheck,
             onMove: handleMove, // Override onMove to handle promotion UI
             premove: premove ?? undefined,
             onPremove: (move) => {
