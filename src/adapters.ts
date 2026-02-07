@@ -81,12 +81,6 @@ export function createGameData(
     isCheck: adapter.isCheck(),
 
     onMove: (move: Move, _metadata?: MoveMetadata) => {
-      // The `move` object already contains `promotion` if it's a promotion move.
-      // The `adapter.makeMove` implementation is responsible for interpreting it.
-      // chess.js uses single letters for promotion: 'q', 'r', 'b', 'n'
-      // promotion: move.promotion
-      //   ? roleToChessJsPromotion(move.promotion)
-      //   : undefined,
       const success = adapter.makeMove(move);
 
       if (success) {
