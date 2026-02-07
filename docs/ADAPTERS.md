@@ -153,4 +153,4 @@ Need to support a new engine? Just implement 4 methods!
 
 When the library updates, your adapter stays the same. When your engine updates, the library stays the same.
 
-Copy the example adapters from `src/examples/adapters/` to get started!
+Copy the example adapters from `example/src/adapters/` to get started!
