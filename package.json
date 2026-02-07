@@ -1,5 +1,5 @@
 {
-  "name": "react-native-chessground",
+  "name": "@fireonmac/react-native-chessground",
   "version": "0.1.0",
   "description": "A React Native port of the chessground library",
   "main": "./lib/module/index.js",
@@ -38,7 +38,7 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "test": "jest",
-    "release": "release-it --only-version"
+    "release": "release-it"
   },
   "keywords": [
     "react-native",
@@ -89,8 +89,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*"
+    "react-native-gesture-handler": "*"
   },
   "workspaces": [
     "example"
